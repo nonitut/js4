@@ -1,0 +1,12 @@
+.box{
+    width: 6vw;
+    height: 6vw;
+    background: orangered;
+    border-radius: 5px;
+    position: absolute;
+}
+
+.flower , .flo{
+    width: 10%;
+    position: absolute ;
+}
