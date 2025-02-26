@@ -1,40 +1,53 @@
 document.addEventListener("DOMContentLoaded", function(){
-
     let flo = document.querySelectorAll(".box , .flower , .flo");
 
     flo.forEach(function(flowers){
-        let gra = false;
-        let offsetX;
-        let offsetY;
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+        let startX = 0;
+        let startY = 0;
+        let currentX = 0;
+        let currentY = 0;
 
-        flowers.addEventListener("mousedown" , function(event){
-            gra = true;
+        flowers.addEventListener("mousedown", function(event){
+            isDragging = true;
 
-            offsetX = event.clientX - flowers.getBoundingClientRect().left; // .clientX - свойство горизонтальной координаты курсора
-            offsetY = event.clientY - flowers.getBoundingClientRect().top;  // .clientY - свойство вертикальной координаты курсора
-            // .getBoundingClientRect() - метод , который возвращает размеры и положение элемента
+            // Считываем начальные координаты
+            startX = event.clientX;
+            startY = event.clientY;
+
+            // Считываем текущий `transform`, если он есть
+            let transform = window.getComputedStyle(flowers).transform;
+
+            if (transform !== "none") {
+                let matrix = new DOMMatrix(transform);
+                currentX = matrix.m41; // Смещение по X
+                currentY = matrix.m42; // Смещение по Y
+            }
 
             function onMouseMove(event){
-                if(gra){
-                    let x =  event.clientX - offsetX;
-                    let y =  event.clientY - offsetY;
+                if (isDragging) {
+                    offsetX = event.clientX - startX;
+                    offsetY = event.clientY - startY;
 
-                    flowers.style.left = x + "px";
-                    flowers.style.top  = y + "px";
-
-                    console.log(" координаты курсора :" , event.clientX , event.clientY)
-                    console.log("координата элемента:" , x , y);
-                }}
+                    flowers.style.transform = `translate(${currentX + offsetX}px, ${currentY + offsetY}px)`;
+                }
+            }
 
             function onMouseUp(){
-                gra = false;
+                isDragging = false;
+
+                // Обновляем текущие координаты после отпускания
+                currentX += offsetX;
+                currentY += offsetY;
+
                 document.removeEventListener("mousemove", onMouseMove);
                 document.removeEventListener("mouseup", onMouseUp);
             }
 
-            document.addEventListener("mousemove",onMouseMove );
+            document.addEventListener("mousemove", onMouseMove);
             document.addEventListener("mouseup", onMouseUp);
-
         });
     });
 });
